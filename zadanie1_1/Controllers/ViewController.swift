@@ -14,7 +14,7 @@ class ViewController: UIViewController {
             case english = "language_english"
             case russian = "language_russian"
             case belarusian = "language_belarusian"
-
+        
             var languageSystemName: String {
                 switch self {
                 case .english:
@@ -26,75 +26,30 @@ class ViewController: UIViewController {
             }
         }
     }
-    
+    private let containerView = ContainerView()
+    private lazy var languagePicker = containerView.languagePicker
     private lazy var keyWindow = UIApplication
         .shared
         .connectedScenes
         .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
         .first { $0.isKeyWindow }
-    
-    private let imageView = UIImageView()
-    private let greetingLabel: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        return label
-    }()
-    private let darkThemeButton: UIButton = {
-        let button = UIButton()
-        button.configuration = .bordered()
-        button.setTitleColor(.systemBlue, for: .normal)
-        return button
-    }()
-    private let lightThemeButton: UIButton = {
-        let button = UIButton()
-        button.configuration = .bordered()
-        button.setTitleColor(.systemBlue, for: .normal)
-        return button
-    }()
-    private let autoThemeButton: UIButton = {
-        let button = UIButton()
-        button.configuration = .bordered()
-        button.setTitleColor(.systemBlue, for: .normal)
-        return button
-    }()
-    private let iconName = "icon"
-    private let languagePicker = UIPickerView()
-
-    private let buttonsStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        stackView.alignment = .center
-        stackView.spacing = 15
-        return stackView
-    }()
-
-    private let darkThemeButtonTitle = NSLocalizedString("button_dark", comment: "")
-    private let lightThemeButtonTitile = NSLocalizedString("button_light", comment: "")
-    private let autoThemeButtonTitile = NSLocalizedString("button_auto", comment: "")
-    private let labelText = NSLocalizedString("label_greetings", comment: "")
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        containerView.frame = UIScreen.main.bounds
         languagePicker.delegate = self
         languagePicker.dataSource = self
-        
-        imageView.image = UIImage(named: iconName)?.withRenderingMode(.alwaysTemplate)
-        
-        greetingLabel.text = labelText
-        
-        darkThemeButton.addTarget(self, action: #selector(darkThemeButtonTapped), for: .touchUpInside)
-        darkThemeButton.setTitle(darkThemeButtonTitle, for: .normal)
-        
-        lightThemeButton.addTarget(self, action: #selector(lightThemeButtonTapped), for: .touchUpInside)
-        lightThemeButton.setTitle(lightThemeButtonTitile, for: .normal)
-
-        autoThemeButton.addTarget(self, action: #selector(autoThemeButtonTapped), for: .touchUpInside)
-        autoThemeButton.setTitle(autoThemeButtonTitile, for: .normal)
-
-        addSubviews()
-        makeConstraints()
+        view.addSubview(containerView)
+        containerView.onDarkThemeButtonTapped = { [weak self] in
+            self?.darkThemeButtonTapped()
+        }
+        containerView.onLightThemeButtonTapped = { [weak self] in
+            self?.lightThemeButtonTapped()
+        }
+        containerView.onAutoThemeButtonTapped = { [weak self] in
+            self?.autoThemeButtonTapped()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -115,68 +70,28 @@ class ViewController: UIViewController {
                 return 0
             }
         }()
-        languagePicker.selectRow(row, inComponent: 0, animated: false)
-    }
-    
-    func addSubviews() {
-        view.addSubview(languagePicker)
-        view.addSubview(imageView)
-        view.addSubview(greetingLabel)
-        view.addSubview(darkThemeButton)
-        view.addSubview(lightThemeButton)
-        view.addSubview(autoThemeButton)
-        buttonsStackView.addArrangedSubview(lightThemeButton)
-        buttonsStackView.addArrangedSubview(autoThemeButton)
-        buttonsStackView.addArrangedSubview(darkThemeButton)
-        view.addSubview(buttonsStackView)
-    }
-    
-    func makeConstraints() {
-        buttonsStackView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().inset(20)
-            make.center.equalToSuperview()
-        }
-        imageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(120)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(70)
-            make.width.equalTo(70)
-        }
-        greetingLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView).offset(150)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(40)
-            make.width.equalTo(100)
-        }
-        languagePicker.snp.makeConstraints { make in
-            make.top.equalTo(buttonsStackView).offset(100)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(150)
-            make.width.equalTo(220)
-        }
-        super.updateViewConstraints()
-    }
-
-    @objc func darkThemeButtonTapped() {
-        keyWindow?.overrideUserInterfaceStyle = .dark
-        UserDefaults.standard.set("dark", forKey: "UserInterfaceStyle")
-    }
-    
-    @objc func lightThemeButtonTapped() {
-        keyWindow?.overrideUserInterfaceStyle = .light
-        UserDefaults.standard.set("light", forKey: "UserInterfaceStyle")
-    }
-
-    @objc func autoThemeButtonTapped() {
-        keyWindow?.overrideUserInterfaceStyle = .unspecified
-        UserDefaults.standard.set("auto", forKey: "UserInterfaceStyle")
+        pickerView.selectRow(row, inComponent: 0, animated: false)
     }
     
     func refreshVC() {
         let vc = ViewController()
         keyWindow?.rootViewController = vc
         keyWindow?.backgroundColor = .systemBackground
+    }
+    
+//MARK: Buttons Actions
+    func darkThemeButtonTapped() {
+        keyWindow?.overrideUserInterfaceStyle = .dark
+        UserDefaults.standard.set("dark", forKey: "UserInterfaceStyle")
+    }
+    
+    func lightThemeButtonTapped() {
+        keyWindow?.overrideUserInterfaceStyle = .light
+        UserDefaults.standard.set("light", forKey: "UserInterfaceStyle")
+    }
+
+    func autoThemeButtonTapped() {
+        keyWindow?.overrideUserInterfaceStyle = .unspecified
     }
 }
 

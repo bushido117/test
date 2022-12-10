@@ -17,16 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
         window?.rootViewController = ViewController()
-        switch UserDefaults.standard.string(forKey: "UserInterfaceStyle") {
-        case "dark":
-            window?.overrideUserInterfaceStyle = .dark
-        case "auto":
-            window?.overrideUserInterfaceStyle = .unspecified
-        case "light":
-            window?.overrideUserInterfaceStyle = .light
-        default:
-            break
-        }
+        window?.overrideUserInterfaceStyle = UserDefaults.standard.string(forKey: "UserInterfaceStyle") == "light" ? .light : .dark
         window?.backgroundColor = .systemBackground
         window?.makeKeyAndVisible()
     }
