@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings
+  zadanie1_1
+
+  Created by Вадим Сайко on 8.12.22.
+  
+*/
+"button_dark" = "Цёмная";
+"button_light" = "Светлая";
+"button_auto" = "Аўта";
+"label_greetings" = "Прывітанне";
+"language_english" = "Англійская";
+"language_russian" = "Рускі";
+"language_belarusian" = "Беларускі";
